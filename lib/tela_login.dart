@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:nectracker/controllers/auth_controller.dart';
+import 'package:nectracker/models/api/entities/usuario/usuario_auth.dart';
 import 'tela_apiarios.dart';
 
 class TelaLogin extends StatefulWidget {
@@ -12,6 +14,41 @@ class _TelaLoginState extends State<TelaLogin> {
   final _formKey = GlobalKey<FormState>();
   String email = '';
   String senha = '';
+  bool _isLoading = false;
+
+  Future<void> _fazerLogin() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final usuario = UsuarioAuthApiModel(email: email, senha: senha);
+      await AuthController.login(usuario);
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TelaApiarios()),
+      );
+    } catch (e) {
+      print(e);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erro ao fazer login. Verifique suas credenciais.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,15 +109,18 @@ class _TelaLoginState extends State<TelaLogin> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const TelaApiarios()),
-                          );
-                        },
-                        child:
-                            const Text('Login', style: TextStyle(fontSize: 18)),
+                        onPressed: _isLoading ? null : _fazerLogin,
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 24,
+                                width: 24,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              )
+                            : const Text('Login',
+                                style: TextStyle(fontSize: 18)),
                       ),
                     ),
                   ],

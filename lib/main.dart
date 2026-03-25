@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'tela_inicial.dart';
+import 'package:nectracker/controllers/auth_controller.dart';
+import 'package:nectracker/tela_inicial.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AuthController.init();
   runApp(const MyApp());
 }
 
