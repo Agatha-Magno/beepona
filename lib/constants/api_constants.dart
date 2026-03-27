@@ -1,1 +1,2 @@
-const baseApiUrl = "http://10.0.2.2:5095/api/v1";
+const baseApiUrl =
+    "https://celebrate-holland-medline-fastest.trycloudflare.com/api/v1";

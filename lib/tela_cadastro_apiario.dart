@@ -1,6 +1,21 @@
 import 'package:flutter/material.dart';
 import 'widgets/colmeia.dart';
 import 'dart:math';
+import 'package:nectracker/repositories/apiario_repository.dart';
+import 'package:nectracker/models/api/entities/apiario/apiario_create.dart';
+
+final _apiarioRepo = ApiarioRepository();
+
+Future<void> cadastrar() async {
+  try {
+    final modelo = ApiarioCreateApiModel(
+        nome: 'Meu Apiário', latitude: 0.0, longitude: 0.0);
+    await _apiarioRepo.criar(modelo);
+    print("Sucesso!");
+  } catch (e) {
+    print("Erro ao criar: $e");
+  }
+}
 
 class TelaCadastroApiario extends StatefulWidget {
   final void Function(String nome, double latitude, double longitude)? onSalvar;
