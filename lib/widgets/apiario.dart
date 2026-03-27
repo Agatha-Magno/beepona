@@ -5,7 +5,7 @@ class Apiario extends StatelessWidget {
   final String nome;
   final double latitude;
   final double longitude;
-  final int colmeias; // Add this
+  final int colmeias;
   final VoidCallback onDelete;
 
   const Apiario({

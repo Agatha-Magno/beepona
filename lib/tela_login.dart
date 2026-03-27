@@ -33,11 +33,10 @@ class _TelaLoginState extends State<TelaLogin> {
         MaterialPageRoute(builder: (context) => const TelaApiarios()),
       );
     } catch (e) {
-      print(e);
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Erro ao fazer login. Verifique suas credenciais.'),
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
           backgroundColor: Colors.red,
         ),
       );

@@ -5,7 +5,7 @@ enum UsuarioEndpointsEnum implements IApiEndpointsEnum {
   registrar("/registrar-usuario", ApiMetodoEnum.post),
   login("/login-usuario", ApiMetodoEnum.post),
   verificarEmail("/verificar-email", ApiMetodoEnum.get),
-  reenviarAtivarEmail("/reenviar-ativacao-email", ApiMetodoEnum.get),
+  reenviarAtivarEmail("/reenviar-ativacao-email", ApiMetodoEnum.post),
   solicitarResetSenha("/solicitar-reset-senha", ApiMetodoEnum.post),
   resetarSenha("/reset-senha", ApiMetodoEnum.post);
 

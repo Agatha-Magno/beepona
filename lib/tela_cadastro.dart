@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'tela_apiarios.dart';
+import 'package:nectracker/controllers/auth_controller.dart';
+import 'package:nectracker/models/api/entities/usuario/usuario_create.dart';
+import 'package:nectracker/tela_confirmar_email.dart';
 
 class TelaCadastro extends StatefulWidget {
   const TelaCadastro({super.key});
@@ -14,6 +16,44 @@ class _TelaCadastroState extends State<TelaCadastro> {
   String email = '';
   String senha = '';
   String confirmeSenha = '';
+  bool _isLoading = false;
+
+  Future<void> _fazerCadastro() async {
+    if (!_formKey.currentState!.validate()) return;
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final usuario = UsuarioCreateApiModel(
+          nome: nome,
+          email: email,
+          senha: senha,
+          confirmarSenha: confirmeSenha);
+
+      await AuthController.registrar(usuario);
+
+      if (!mounted) return;
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const TelaConfirmarEmail()),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll('Exception: ', '')),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   // ...existing code...
   @override
@@ -98,15 +138,13 @@ class _TelaCadastroState extends State<TelaCadastro> {
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const TelaApiarios()),
-                          );
-                        },
-                        child: const Text('Cadastrar',
-                            style: TextStyle(fontSize: 18)),
+                        onPressed: _isLoading ? null : _fazerCadastro,
+                        child: _isLoading
+                            ? const CircularProgressIndicator(
+                                color: Colors.white,
+                              )
+                            : const Text('Cadastrar',
+                                style: TextStyle(fontSize: 18)),
                       ),
                     ),
                   ],

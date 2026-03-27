@@ -22,7 +22,6 @@ class TelaInicial extends StatelessWidget {
                       'assets/logo.png',
                       height: 120,
                     ),
-                    const SizedBox(height: 24),
                     const Text(
                       'Beepona',
                       style: TextStyle(
@@ -30,6 +29,11 @@ class TelaInicial extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                         color: Colors.black87,
                       ),
+                    ),
+                    const SizedBox(height: 24),
+                    Image.asset(
+                      'assets/logo_ifto.png',
+                      height: 60,
                     ),
                   ],
                 ),

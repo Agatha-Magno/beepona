@@ -187,7 +187,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                 const SizedBox(height: 16),
                 _buildLabel('Produto'),
                 DropdownButtonFormField<String>(
-                  value: produtoSelecionado,
+                  initialValue: produtoSelecionado,
                   items: ['Mel', 'Própolis', 'Outros']
                       .map((prod) => DropdownMenuItem(
                             value: prod,
@@ -220,7 +220,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                 const SizedBox(height: 16),
                 _buildLabel('Apiário'),
                 DropdownButtonFormField<String>(
-                  value: apiarioSelecionado,
+                  initialValue: apiarioSelecionado,
                   items: widget.apiarios
                       .map((apiario) => DropdownMenuItem<String>(
                             value: apiario['number'] as String,
@@ -247,7 +247,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
             right: 0,
             bottom: 0,
             child: Container(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: SizedBox(
                 width: double.infinity,

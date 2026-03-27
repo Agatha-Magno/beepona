@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'widgets/colmeia.dart';
-import 'dart:math';
 import 'package:nectracker/repositories/apiario_repository.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_create.dart';
 
@@ -20,11 +20,52 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
   final ApiarioRepository _apiarioRepo = ApiarioRepository();
   List<Map<String, dynamic>> colmeias = [];
   bool _isLoading = false;
+  bool _isLoadingLocalizacao = false;
 
-  void _gerarLocalizacaoAleatoria() {
-    final random = Random();
-    latitudeController.text = (-23.0 + random.nextDouble()).toStringAsFixed(5);
-    longitudeController.text = (-46.0 + random.nextDouble()).toStringAsFixed(5);
+  Future<void> _obterLocalizacaoAtual() async {
+    setState(() {
+      _isLoadingLocalizacao = true;
+    });
+
+    try {
+      bool serviceEnabled;
+      LocationPermission permission;
+
+      serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        throw Exception('Os serviços de localização estão desativados.');
+      }
+
+      permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          throw Exception('As permissões de localização foram negadas.');
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        throw Exception(
+            'As permissões de localização foram permanentemente negadas.');
+      }
+
+      Position position = await Geolocator.getCurrentPosition();
+
+      latitudeController.text = position.latitude.toString();
+      longitudeController.text = position.longitude.toString();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString().replaceAll('Exception: ', ''))),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoadingLocalizacao = false;
+        });
+      }
+    }
   }
 
   Future<void> _salvarApiario() async {
@@ -66,7 +107,8 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
       if (mounted) {
         String mensagemErro = e.toString();
         if (mensagemErro.startsWith('Exception: ')) {
-          mensagemErro = mensagemErro.substring(11); // Remove prefixo "Exception: "
+          mensagemErro =
+              mensagemErro.substring(11); // Remove prefixo "Exception: "
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro: $mensagemErro')),
@@ -202,12 +244,22 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
                       ),
                       elevation: 0,
                     ),
-                    onPressed: _gerarLocalizacaoAleatoria,
-                    child: const Text(
-                      'Obter a localização atual',
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                    ),
+                    onPressed:
+                        _isLoadingLocalizacao ? null : _obterLocalizacaoAtual,
+                    child: _isLoadingLocalizacao
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            'Obter a localização atual',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 32),
@@ -239,7 +291,7 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
             right: 0,
             bottom: 0,
             child: Container(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: SizedBox(
                 width: double.infinity,
@@ -253,7 +305,7 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
                     ),
                   ),
                   onPressed: _isLoading ? null : _salvarApiario,
-                  child: _isLoading 
+                  child: _isLoading
                       ? const SizedBox(
                           height: 24,
                           width: 24,
@@ -264,7 +316,8 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
                         )
                       : const Text(
                           'Salvar',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                 ),
               ),
