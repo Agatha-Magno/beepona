@@ -4,19 +4,6 @@ import 'dart:math';
 import 'package:nectracker/repositories/apiario_repository.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_create.dart';
 
-final _apiarioRepo = ApiarioRepository();
-
-Future<void> cadastrar() async {
-  try {
-    final modelo = ApiarioCreateApiModel(
-        nome: 'Meu Apiário', latitude: 0.0, longitude: 0.0);
-    await _apiarioRepo.criar(modelo);
-    print("Sucesso!");
-  } catch (e) {
-    print("Erro ao criar: $e");
-  }
-}
-
 class TelaCadastroApiario extends StatefulWidget {
   final void Function(String nome, double latitude, double longitude)? onSalvar;
 
@@ -30,7 +17,9 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
   final TextEditingController nomeController = TextEditingController();
   final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
+  final ApiarioRepository _apiarioRepo = ApiarioRepository();
   List<Map<String, dynamic>> colmeias = [];
+  bool _isLoading = false;
 
   void _gerarLocalizacaoAleatoria() {
     final random = Random();
@@ -38,13 +27,57 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
     longitudeController.text = (-46.0 + random.nextDouble()).toStringAsFixed(5);
   }
 
-  void _salvarApiario() {
-    if (widget.onSalvar != null) {
-      final nome = nomeController.text;
-      final latitude = double.tryParse(latitudeController.text) ?? 0.0;
-      final longitude = double.tryParse(longitudeController.text) ?? 0.0;
-      widget.onSalvar!(nome, latitude, longitude);
-      Navigator.pop(context);
+  Future<void> _salvarApiario() async {
+    final nome = nomeController.text.trim();
+    final latitude = double.tryParse(latitudeController.text) ?? 0.0;
+    final longitude = double.tryParse(longitudeController.text) ?? 0.0;
+
+    if (nome.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, insira o nome do apiário.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final modelo = ApiarioCreateApiModel(
+        nome: nome,
+        latitude: latitude,
+        longitude: longitude,
+      );
+
+      await _apiarioRepo.criar(modelo);
+
+      if (widget.onSalvar != null) {
+        widget.onSalvar!(nome, latitude, longitude);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Apiário cadastrado com sucesso!')),
+        );
+        Navigator.pop(context, true);
+      }
+    } catch (e) {
+      if (mounted) {
+        String mensagemErro = e.toString();
+        if (mensagemErro.startsWith('Exception: ')) {
+          mensagemErro = mensagemErro.substring(11); // Remove prefixo "Exception: "
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro: $mensagemErro')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
@@ -219,11 +252,20 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: _salvarApiario,
-                  child: const Text(
-                    'Salvar',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
+                  onPressed: _isLoading ? null : _salvarApiario,
+                  child: _isLoading 
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Salvar',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
                 ),
               ),
             ),

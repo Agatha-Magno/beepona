@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:nectracker/models/api/entities/apiario/apiario_read.dart';
+import 'package:nectracker/repositories/apiario_repository.dart';
 import 'widgets/apiario.dart';
 import 'tela_cadastro_apiario.dart';
 import 'tela_cadastro_colmeia.dart';
-import 'dart:math';
 
 class TelaApiarios extends StatefulWidget {
   const TelaApiarios({super.key});
@@ -12,9 +13,43 @@ class TelaApiarios extends StatefulWidget {
 }
 
 class _TelaApiariosState extends State<TelaApiarios> {
-  final List<Map<String, dynamic>> apiarios = [];
-  int apiarioCount = 0;
-  final Random random = Random();
+  final ApiarioRepository _apiarioRepo = ApiarioRepository();
+  List<ApiarioReadApiModel> apiarios = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _carregarApiarios();
+  }
+
+  Future<void> _carregarApiarios() async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final data = await _apiarioRepo.buscarTodos();
+      setState(() {
+        apiarios = data;
+      });
+    } catch (e) {
+      if (mounted) {
+        String mensagemErro = e.toString();
+        if (mensagemErro.startsWith('Exception: ')) {
+          mensagemErro = mensagemErro.substring(11); // Remove prefixo "Exception: "
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar apiários: $mensagemErro')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -137,25 +172,16 @@ class _TelaApiariosState extends State<TelaApiarios> {
                   ),
                   elevation: 0,
                 ),
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => TelaCadastroApiario(
-                        onSalvar: (nome, latitude, longitude) {
-                          setState(() {
-                            apiarioCount++;
-                            apiarios.add({
-                              'number': apiarioCount,
-                              'nome': nome,
-                              'latitude': latitude,
-                              'longitude': longitude,
-                            });
-                          });
-                        },
-                      ),
+                      builder: (context) => const TelaCadastroApiario(),
                     ),
                   );
+                  if (result == true) {
+                    _carregarApiarios();
+                  }
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -195,25 +221,21 @@ class _TelaApiariosState extends State<TelaApiarios> {
                   elevation: 0,
                 ),
                 onPressed: () async {
+                  final listaParaDropdown = apiarios.map((a) => {
+                    'number': a.id,
+                    'nome': a.nome,
+                  }).toList();
+
                   final colmeia = await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => TelaCadastroColmeia(
-                        apiarios: apiarios,
+                        apiarios: listaParaDropdown,
                       ),
                     ),
                   );
-                  if (colmeia != null && colmeia['apiarioNumber'] != null) {
-                    setState(() {
-                      final idx = apiarios.indexWhere(
-                          (a) => a['number'] == colmeia['apiarioNumber']);
-                      if (idx != -1) {
-                        apiarios[idx]['colmeias'] =
-                            (apiarios[idx]['colmeias'] ?? 0) + 1;
-                        apiarios[idx]['colmeiasList'] =
-                            (apiarios[idx]['colmeiasList'] ?? [])..add(colmeia);
-                      }
-                    });
+                  if (colmeia != null) {
+                    _carregarApiarios();
                   }
                 },
                 child: Row(
@@ -242,24 +264,35 @@ class _TelaApiariosState extends State<TelaApiarios> {
             ),
             const SizedBox(height: 24),
             Expanded(
-              child: ListView.builder(
-                itemCount: apiarios.length,
-                itemBuilder: (context, index) {
-                  final apiario = apiarios[index];
-                  return Apiario(
-                    number: apiario['number'],
-                    nome: apiario['nome'] ?? '',
-                    latitude: apiario['latitude'],
-                    longitude: apiario['longitude'],
-                    colmeias: apiario['colmeias'] ?? 0,
-                    onDelete: () {
-                      setState(() {
-                        apiarios.removeAt(index);
-                      });
-                    },
-                  );
-                },
-              ),
+              child: isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFFFF9700),
+                      ),
+                    )
+                  : apiarios.isEmpty
+                      ? const Center(
+                          child: Text(
+                            'Nenhum apiário cadastrado.',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        )
+                      : ListView.builder(
+                          itemCount: apiarios.length,
+                          itemBuilder: (context, index) {
+                            final apiario = apiarios[index];
+                            return Apiario(
+                              id: apiario.id,
+                              nome: apiario.nome,
+                              latitude: apiario.latitude ?? 0.0,
+                              longitude: apiario.longitude ?? 0.0,
+                              colmeias: apiario.qtdColmeias,
+                              onDelete: () {
+                                // TODO: implementar soft delete se necessário no backend
+                              },
+                            );
+                          },
+                        ),
             ),
           ],
         ),

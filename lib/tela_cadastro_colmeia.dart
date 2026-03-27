@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:nectracker/enums/produto_enum.dart';
+import 'package:nectracker/models/api/entities/colmeia/colmeia_create.dart';
+import 'package:nectracker/repositories/colmeia_repository.dart';
 
 class TelaCadastroColmeia extends StatefulWidget {
   final List<Map<String, dynamic>> apiarios;
@@ -15,7 +18,76 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
   final TextEditingController dataController = TextEditingController();
   final TextEditingController pesoController = TextEditingController();
   String produtoSelecionado = 'Mel';
-  int? apiarioSelecionado;
+  String? apiarioSelecionado;
+  final ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
+  bool _isLoading = false;
+
+  Future<void> _salvarColmeia() async {
+    if (apiarioSelecionado == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, selecione um apiário.')),
+      );
+      return;
+    }
+
+    final nome = nomeController.text.trim();
+    if (nome.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor, insira o nome da colmeia.')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final modelo = ColmeiaCreateApiModel(
+        apiarioId: apiarioSelecionado.toString(),
+        nome: nome,
+        produto: ProdutoEnum.toEnum(produtoSelecionado),
+        peso: double.tryParse(pesoController.text) ?? 0.0,
+      );
+
+      await _colmeiaRepo.criar(modelo);
+
+      final result = {
+        'nome': nome,
+        'data': dataController.text,
+        'produto': produtoSelecionado,
+        'peso': modelo.peso,
+        'apiarioNumber': apiarioSelecionado,
+      };
+
+      if (widget.onSalvar != null) {
+        widget.onSalvar!(result);
+      }
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Colmeia cadastrada com sucesso!')),
+        );
+        Navigator.pop(context, result);
+      }
+    } catch (e) {
+      if (mounted) {
+        String mensagemErro = e.toString();
+        if (mensagemErro.startsWith('Exception: ')) {
+          mensagemErro = mensagemErro.substring(11);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro: $mensagemErro')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +188,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                 _buildLabel('Produto'),
                 DropdownButtonFormField<String>(
                   value: produtoSelecionado,
-                  items: ['Mel', 'Própolis', 'Outro']
+                  items: ['Mel', 'Própolis', 'Outros']
                       .map((prod) => DropdownMenuItem(
                             value: prod,
                             child: Text(prod),
@@ -147,13 +219,12 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                 ),
                 const SizedBox(height: 16),
                 _buildLabel('Apiário'),
-                DropdownButtonFormField<int>(
+                DropdownButtonFormField<String>(
                   value: apiarioSelecionado,
                   items: widget.apiarios
-                      .map((apiario) => DropdownMenuItem<int>(
-                            value: apiario['number'] as int,
-                            child: Text(apiario['nome'] ??
-                                'Apiario #${apiario['number']}'),
+                      .map((apiario) => DropdownMenuItem<String>(
+                            value: apiario['number'] as String,
+                            child: Text(apiario['nome'] ?? 'Apiário'),
                           ))
                       .toList(),
                   onChanged: (value) {
@@ -189,24 +260,21 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  onPressed: () {
-                    if (widget.onSalvar != null && apiarioSelecionado != null) {
-                      widget.onSalvar!(
-                        {
-                          'nome': nomeController.text,
-                          'data': dataController.text,
-                          'produto': produtoSelecionado,
-                          'peso': double.tryParse(pesoController.text) ?? 0.0,
-                          'apiarioNumber': apiarioSelecionado,
-                        },
-                      );
-                      Navigator.pop(context);
-                    }
-                  },
-                  child: const Text(
-                    'Salvar',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                  ),
+                  onPressed: _isLoading ? null : _salvarColmeia,
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'Salvar',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
                 ),
               ),
             ),

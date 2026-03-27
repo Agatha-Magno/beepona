@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Apiario extends StatelessWidget {
-  final int number;
+  final String id;
   final String nome;
   final double latitude;
   final double longitude;
@@ -10,7 +10,7 @@ class Apiario extends StatelessWidget {
 
   const Apiario({
     super.key,
-    required this.number,
+    required this.id,
     required this.nome,
     required this.latitude,
     required this.longitude,
@@ -47,7 +47,7 @@ class Apiario extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    nome.isNotEmpty ? nome : 'Apiario #$number',
+                    nome.isNotEmpty ? nome : 'Apiário',
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
