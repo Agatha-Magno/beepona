@@ -3,11 +3,14 @@ import 'package:geolocator/geolocator.dart';
 import 'widgets/colmeia.dart';
 import 'package:nectracker/repositories/apiario_repository.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_create.dart';
+import 'package:nectracker/models/api/entities/apiario/apiario_read.dart';
+import 'package:nectracker/models/api/entities/apiario/apiario_update.dart';
 
 class TelaCadastroApiario extends StatefulWidget {
   final void Function(String nome, double latitude, double longitude)? onSalvar;
+  final ApiarioReadApiModel? apiario;
 
-  const TelaCadastroApiario({super.key, this.onSalvar});
+  const TelaCadastroApiario({super.key, this.onSalvar, this.apiario});
 
   @override
   State<TelaCadastroApiario> createState() => _TelaCadastroApiarioState();
@@ -21,6 +24,16 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
   List<Map<String, dynamic>> colmeias = [];
   bool _isLoading = false;
   bool _isLoadingLocalizacao = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.apiario != null) {
+      nomeController.text = widget.apiario!.nome;
+      latitudeController.text = widget.apiario!.latitude?.toString() ?? '';
+      longitudeController.text = widget.apiario!.longitude?.toString() ?? '';
+    }
+  }
 
   Future<void> _obterLocalizacaoAtual() async {
     setState(() {
@@ -85,22 +98,43 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
     });
 
     try {
-      final modelo = ApiarioCreateApiModel(
-        nome: nome,
-        latitude: latitude,
-        longitude: longitude,
-      );
+      if (widget.apiario == null) {
+        final modelo = ApiarioCreateApiModel(
+          nome: nome,
+          latitude: latitude,
+          longitude: longitude,
+        );
 
-      await _apiarioRepo.criar(modelo);
+        await _apiarioRepo.criar(modelo);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Apiário cadastrado com sucesso!')),
+          );
+        }
+      } else {
+        final modelo = ApiarioUpdateApiModel(
+          id: widget.apiario!.id,
+          nome: nome,
+          latitude: latitude,
+          longitude: longitude,
+          ativo: widget.apiario!.ativo,
+        );
+
+        await _apiarioRepo.atualizar(modelo);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Apiário atualizado com sucesso!')),
+          );
+        }
+      }
 
       if (widget.onSalvar != null) {
         widget.onSalvar!(nome, latitude, longitude);
       }
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Apiário cadastrado com sucesso!')),
-        );
         Navigator.pop(context, true);
       }
     } catch (e) {
@@ -189,9 +223,9 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Informações do Apiário',
-                  style: TextStyle(
+                Text(
+                  widget.apiario != null ? 'Editar Apiário' : 'Novo Apiário',
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                   ),

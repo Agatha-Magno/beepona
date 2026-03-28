@@ -86,6 +86,7 @@ flutter:
     - assets/Plus_Icon.png
     - assets/Profile_Icon.png
     - assets/Delete_Icon.png
+    - assets/Edit_Icon.png
     - assets/Swarm_Icon.png
 
   # To add assets to your application, add an assets section, like this:

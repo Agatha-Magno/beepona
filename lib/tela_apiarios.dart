@@ -287,6 +287,17 @@ class _TelaApiariosState extends State<TelaApiarios> {
                               latitude: apiario.latitude ?? 0.0,
                               longitude: apiario.longitude ?? 0.0,
                               colmeias: apiario.qtdColmeias,
+                              onEdit: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TelaCadastroApiario(apiario: apiario),
+                                  ),
+                                );
+                                if (result == true) {
+                                  _carregarApiarios();
+                                }
+                              },
                               onDelete: () {
                                 // TODO: implementar soft delete se necessário no backend
                               },

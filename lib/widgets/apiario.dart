@@ -7,6 +7,7 @@ class Apiario extends StatelessWidget {
   final double longitude;
   final int colmeias;
   final VoidCallback onDelete;
+  final VoidCallback onEdit;
 
   const Apiario({
     super.key,
@@ -16,6 +17,7 @@ class Apiario extends StatelessWidget {
     required this.longitude,
     required this.colmeias,
     required this.onDelete,
+    required this.onEdit,
   });
 
   @override
@@ -28,7 +30,7 @@ class Apiario extends StatelessWidget {
           decoration: BoxDecoration(
             color: const Color(0xFFFFE49A),
             borderRadius: BorderRadius.circular(12),
-            boxShadow: [
+            boxShadow: const [
               BoxShadow(
                 color: Colors.black12,
                 blurRadius: 4,
@@ -46,11 +48,14 @@ class Apiario extends StatelessWidget {
                     height: 28,
                   ),
                   const SizedBox(width: 8),
-                  Text(
-                    nome.isNotEmpty ? nome : 'Apiário',
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                  Expanded(
+                    child: Text(
+                      nome.isNotEmpty ? nome : 'Apiário',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -74,8 +79,22 @@ class Apiario extends StatelessWidget {
           ),
         ),
         Positioned(
-          bottom: 8,
-          right: 8,
+          top: 24,
+          right: 24,
+          child: IconButton(
+            icon: Image.asset(
+              'assets/Edit_Icon.png',
+              height: 24,
+            ),
+            onPressed: onEdit,
+            tooltip: 'Editar',
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
+          ),
+        ),
+        Positioned(
+          bottom: 24,
+          right: 24,
           child: IconButton(
             icon: Image.asset(
               'assets/Delete_Icon.png',
@@ -83,6 +102,8 @@ class Apiario extends StatelessWidget {
             ),
             onPressed: onDelete,
             tooltip: 'Excluir',
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(),
           ),
         ),
       ],
