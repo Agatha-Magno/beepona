@@ -21,8 +21,8 @@ class ApiarioReadApiModel implements IJson {
       ApiarioReadApiModel(
         id: json['id'],
         nome: json['nome'],
-        latitude: json['latitude'],
-        longitude: json['longitude'],
+        latitude: (json['latitude'] as num?)?.toDouble(),
+        longitude: (json['longitude'] as num?)?.toDouble(),
         qtdColmeias: json['qtdColmeias'],
         ativo: json['ativo'],
       );

@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'widgets/colmeia.dart';
 import 'package:nectracker/repositories/apiario_repository.dart';
+import 'package:nectracker/repositories/colmeia_repository.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_create.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_read.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_update.dart';
+import 'package:nectracker/models/api/entities/colmeia/colmeia_read_update.dart';
+import 'package:nectracker/enums/produto_enum.dart';
 
 class TelaCadastroApiario extends StatefulWidget {
   final void Function(String nome, double latitude, double longitude)? onSalvar;
@@ -21,7 +24,8 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
   final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
   final ApiarioRepository _apiarioRepo = ApiarioRepository();
-  List<Map<String, dynamic>> colmeias = [];
+  final ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
+  List<ColmeiaReadUpdateApiModel> colmeias = [];
   bool _isLoading = false;
   bool _isLoadingLocalizacao = false;
 
@@ -32,6 +36,22 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
       nomeController.text = widget.apiario!.nome;
       latitudeController.text = widget.apiario!.latitude?.toString() ?? '';
       longitudeController.text = widget.apiario!.longitude?.toString() ?? '';
+      _carregarColmeias();
+    }
+  }
+
+  Future<void> _carregarColmeias() async {
+    try {
+      final data = await _colmeiaRepo.buscarTodos(apiarioId: widget.apiario!.id);
+      setState(() {
+        colmeias = data;
+      });
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao carregar colmeias: ${e.toString().replaceAll('Exception: ', '')}')),
+        );
+      }
     }
   }
 
@@ -306,17 +326,17 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
                   textAlign: TextAlign.left,
                 ),
                 const SizedBox(height: 16),
-                const SizedBox(height: 80),
                 Column(
                   children: colmeias
-                      .map((colmeia) => Colmeia(
-                            nome: colmeia['nome'],
-                            data: colmeia['data'],
-                            peso: colmeia['peso'],
-                            produto: colmeia['produto'],
+                      .map((colmeiaItem) => Colmeia(
+                            nome: colmeiaItem.nome,
+                            data: 'Não informada',
+                            peso: colmeiaItem.peso,
+                            produto: ProdutoEnum.fromEnum(colmeiaItem.produto),
                           ))
                       .toList(),
-                )
+                ),
+                const SizedBox(height: 80), // Mover o espaço para o final da lista para permitir scroll acima do botão fixo
               ],
             ),
           ),

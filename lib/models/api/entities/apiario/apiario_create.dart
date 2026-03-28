@@ -14,8 +14,8 @@ class ApiarioCreateApiModel implements IJson {
   factory ApiarioCreateApiModel.fromJson(Map<String, dynamic> json) =>
       ApiarioCreateApiModel(
         nome: json['nome'],
-        latitude: json['latitude'],
-        longitude: json['longitude'],
+        latitude: (json['latitude'] as num?)?.toDouble(),
+        longitude: (json['longitude'] as num?)?.toDouble(),
       );
 
   @override

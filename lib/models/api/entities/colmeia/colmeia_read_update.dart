@@ -21,7 +21,7 @@ class ColmeiaReadUpdateApiModel implements IJson {
         id: json['id'],
         nome: json['nome'],
         produto: ProdutoEnum.toEnum(json['produto']),
-        peso: json['peso'],
+        peso: (json['peso'] as num).toDouble(),
         ativa: json['ativa'],
       );
 
