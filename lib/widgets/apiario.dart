@@ -8,6 +8,7 @@ class Apiario extends StatelessWidget {
   final int colmeias;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
+  final VoidCallback onTap;
 
   const Apiario({
     super.key,
@@ -18,64 +19,68 @@ class Apiario extends StatelessWidget {
     required this.colmeias,
     required this.onDelete,
     required this.onEdit,
+    required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: const Color(0xFFFFE49A),
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Image.asset(
-                    'assets/Apiary_Icon.png',
-                    height: 28,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      nome.isNotEmpty ? nome : 'Apiário',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
-                      overflow: TextOverflow.ellipsis,
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFFE49A),
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/Apiary_Icon.png',
+                      height: 28,
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Colmeias: $colmeias', // Show number of hives
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Latitude: ${latitude.toStringAsFixed(5)}',
-                style: const TextStyle(fontSize: 16),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Longitude: ${longitude.toStringAsFixed(5)}',
-                style: const TextStyle(fontSize: 16),
-              ),
-            ],
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        nome.isNotEmpty ? nome : 'Apiário',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Colmeias: $colmeias', // Show number of hives
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Latitude: ${latitude.toStringAsFixed(5)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Longitude: ${longitude.toStringAsFixed(5)}',
+                  style: const TextStyle(fontSize: 16),
+                ),
+              ],
+            ),
           ),
         ),
         Positioned(

@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'widgets/colmeia.dart';
 import 'package:nectracker/repositories/apiario_repository.dart';
-import 'package:nectracker/repositories/colmeia_repository.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_create.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_read.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_update.dart';
-import 'package:nectracker/models/api/entities/colmeia/colmeia_read_update.dart';
-import 'package:nectracker/enums/produto_enum.dart';
 
 class TelaCadastroApiario extends StatefulWidget {
   final void Function(String nome, double latitude, double longitude)? onSalvar;
@@ -24,8 +20,6 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
   final TextEditingController latitudeController = TextEditingController();
   final TextEditingController longitudeController = TextEditingController();
   final ApiarioRepository _apiarioRepo = ApiarioRepository();
-  final ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
-  List<ColmeiaReadUpdateApiModel> colmeias = [];
   bool _isLoading = false;
   bool _isLoadingLocalizacao = false;
 
@@ -36,22 +30,6 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
       nomeController.text = widget.apiario!.nome;
       latitudeController.text = widget.apiario!.latitude?.toString() ?? '';
       longitudeController.text = widget.apiario!.longitude?.toString() ?? '';
-      _carregarColmeias();
-    }
-  }
-
-  Future<void> _carregarColmeias() async {
-    try {
-      final data = await _colmeiaRepo.buscarTodos(apiarioId: widget.apiario!.id);
-      setState(() {
-        colmeias = data;
-      });
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao carregar colmeias: ${e.toString().replaceAll('Exception: ', '')}')),
-        );
-      }
     }
   }
 
@@ -309,40 +287,21 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
                               strokeWidth: 2,
                             ),
                           )
-                        : const Text(
-                            'Obter a localização atual',
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold, fontSize: 16),
+                        : const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(Icons.location_on),
+                              SizedBox(width: 8),
+                              Text(
+                                'Obter a localização atual',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 16),
+                              ),
+                            ],
                           ),
                   ),
                 ),
-                const SizedBox(height: 32),
-                const Text(
-                  'Colmeias',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.left,
-                ),
-                const SizedBox(height: 16),
-                Column(
-                  children: colmeias
-                      .map((colmeiaItem) => Colmeia(
-                            id: colmeiaItem.id,
-                            nome: colmeiaItem.nome,
-                            peso: colmeiaItem.peso,
-                            produto: ProdutoEnum.fromEnum(colmeiaItem.produto),
-                            onEdit: () {
-                              // TODO: implementar edição se necessário
-                            },
-                            onDelete: () {
-                              // TODO: implementar exclusão se necessário
-                            },
-                          ))
-                      .toList(),
-                ),
-                const SizedBox(height: 80), // Mover o espaço para o final da lista para permitir scroll acima do botão fixo
+                const SizedBox(height: 80),
               ],
             ),
           ),

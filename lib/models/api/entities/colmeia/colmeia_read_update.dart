@@ -29,7 +29,7 @@ class ColmeiaReadUpdateApiModel implements IJson {
   Map<String, dynamic> toJson() => {
         'id': id,
         'nome': nome,
-        'produto': ProdutoEnum.fromEnum(produto),
+        'produto': ProdutoEnum.toValue(produto),
         'peso': peso,
         'ativa': ativa,
       };

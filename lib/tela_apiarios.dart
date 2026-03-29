@@ -3,9 +3,10 @@ import 'package:nectracker/models/api/entities/apiario/apiario_read.dart';
 import 'package:nectracker/repositories/apiario_repository.dart';
 import 'widgets/apiario.dart';
 import 'tela_cadastro_apiario.dart';
-import 'tela_cadastro_colmeia.dart';
 
 import 'tela_perfil.dart';
+
+import 'tela_colmeias.dart';
 
 class TelaApiarios extends StatefulWidget {
   const TelaApiarios({super.key});
@@ -38,7 +39,8 @@ class _TelaApiariosState extends State<TelaApiarios> {
       if (mounted) {
         String mensagemErro = e.toString();
         if (mensagemErro.startsWith('Exception: ')) {
-          mensagemErro = mensagemErro.substring(11); // Remove prefixo "Exception: "
+          mensagemErro =
+              mensagemErro.substring(11); // Remove prefixo "Exception: "
         }
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao carregar apiários: $mensagemErro')),
@@ -216,60 +218,21 @@ class _TelaApiariosState extends State<TelaApiarios> {
                 ),
               ),
             ),
-            const SizedBox(height: 24),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFF9700),
-                  foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.info_outline, size: 18, color: Colors.grey[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Clique nos apiários para ver e cadastrar colmeias',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    fontStyle: FontStyle.italic,
                   ),
-                  elevation: 0,
                 ),
-                onPressed: () async {
-                  final listaParaDropdown = apiarios.map((a) => {
-                    'number': a.id,
-                    'nome': a.nome,
-                  }).toList();
-
-                  final colmeia = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => TelaCadastroColmeia(
-                        apiarios: listaParaDropdown,
-                      ),
-                    ),
-                  );
-                  if (colmeia != null) {
-                    _carregarApiarios();
-                  }
-                },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Image.asset(
-                      'assets/Swarm_Icon.png',
-                      height: 24,
-                    ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      'Cadastrar Nova Colmeia',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Image.asset(
-                      'assets/Plus_Icon.png',
-                      height: 24,
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ),
             const SizedBox(height: 24),
             Expanded(
@@ -296,11 +259,22 @@ class _TelaApiariosState extends State<TelaApiarios> {
                               latitude: apiario.latitude ?? 0.0,
                               longitude: apiario.longitude ?? 0.0,
                               colmeias: apiario.qtdColmeias,
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        TelaColmeias(apiario: apiario),
+                                  ),
+                                );
+                                _carregarApiarios(); // Recarregar caso algo mude
+                              },
                               onEdit: () async {
                                 final result = await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => TelaCadastroApiario(apiario: apiario),
+                                    builder: (context) =>
+                                        TelaCadastroApiario(apiario: apiario),
                                   ),
                                 );
                                 if (result == true) {

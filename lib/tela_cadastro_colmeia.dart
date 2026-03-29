@@ -5,9 +5,10 @@ import 'package:nectracker/repositories/colmeia_repository.dart';
 
 class TelaCadastroColmeia extends StatefulWidget {
   final List<Map<String, dynamic>> apiarios;
+  final String? apiarioId;
   final void Function(Map<String, dynamic> colmeia)? onSalvar;
 
-  const TelaCadastroColmeia({super.key, required this.apiarios, this.onSalvar});
+  const TelaCadastroColmeia({super.key, required this.apiarios, this.apiarioId, this.onSalvar});
 
   @override
   State<TelaCadastroColmeia> createState() => _TelaCadastroColmeiaState();
@@ -20,6 +21,12 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
   String? apiarioSelecionado;
   ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
   bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    apiarioSelecionado = widget.apiarioId;
+  }
 
 
 
@@ -177,7 +184,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                 const SizedBox(height: 16),
                 _buildLabel('Produto'),
                 DropdownButtonFormField<String>(
-                  initialValue: produtoSelecionado,
+                  value: produtoSelecionado,
                   items: ['Mel', 'Própolis', 'Outros']
                       .map((prod) => DropdownMenuItem(
                             value: prod,
@@ -210,7 +217,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                 const SizedBox(height: 16),
                 _buildLabel('Apiário'),
                 DropdownButtonFormField<String>(
-                  initialValue: apiarioSelecionado,
+                  value: apiarioSelecionado,
                   items: widget.apiarios
                       .map((apiario) => DropdownMenuItem<String>(
                             value: apiario['number'] as String,

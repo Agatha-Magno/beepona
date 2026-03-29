@@ -26,7 +26,7 @@ class ColmeiaCreateApiModel implements IJson {
   Map<String, dynamic> toJson() => {
         'apiarioId': apiarioId,
         'nome': nome,
-        'produto': ProdutoEnum.fromEnum(produto),
+        'produto': ProdutoEnum.toValue(produto),
         'peso': peso,
       };
 }
