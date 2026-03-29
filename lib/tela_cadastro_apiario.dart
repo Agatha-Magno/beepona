@@ -329,10 +329,16 @@ class _TelaCadastroApiarioState extends State<TelaCadastroApiario> {
                 Column(
                   children: colmeias
                       .map((colmeiaItem) => Colmeia(
+                            id: colmeiaItem.id,
                             nome: colmeiaItem.nome,
-                            data: 'Não informada',
                             peso: colmeiaItem.peso,
                             produto: ProdutoEnum.fromEnum(colmeiaItem.produto),
+                            onEdit: () {
+                              // TODO: implementar edição se necessário
+                            },
+                            onDelete: () {
+                              // TODO: implementar exclusão se necessário
+                            },
                           ))
                       .toList(),
                 ),

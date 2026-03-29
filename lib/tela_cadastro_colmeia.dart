@@ -15,12 +15,13 @@ class TelaCadastroColmeia extends StatefulWidget {
 
 class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
   final TextEditingController nomeController = TextEditingController();
-  final TextEditingController dataController = TextEditingController();
   final TextEditingController pesoController = TextEditingController();
   String produtoSelecionado = 'Mel';
   String? apiarioSelecionado;
-  final ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
+  ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
   bool _isLoading = false;
+
+
 
   Future<void> _salvarColmeia() async {
     if (apiarioSelecionado == null) {
@@ -54,7 +55,6 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
 
       final result = {
         'nome': nome,
-        'data': dataController.text,
         'produto': produtoSelecionado,
         'peso': modelo.peso,
         'apiarioNumber': apiarioSelecionado,
@@ -173,17 +173,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                     hintText: 'Digite o nome da colmeia',
                   ),
                 ),
-                const SizedBox(height: 16),
-                _buildLabel('Data'),
-                TextField(
-                  controller: dataController,
-                  decoration: const InputDecoration(
-                    border: OutlineInputBorder(),
-                    filled: true,
-                    fillColor: Color(0xFFFFE49A),
-                    hintText: 'Digite a data',
-                  ),
-                ),
+
                 const SizedBox(height: 16),
                 _buildLabel('Produto'),
                 DropdownButtonFormField<String>(
