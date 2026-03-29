@@ -5,6 +5,8 @@ import 'widgets/apiario.dart';
 import 'tela_cadastro_apiario.dart';
 import 'tela_cadastro_colmeia.dart';
 
+import 'tela_perfil.dart';
+
 class TelaApiarios extends StatefulWidget {
   const TelaApiarios({super.key});
 
@@ -89,7 +91,14 @@ class _TelaApiariosState extends State<TelaApiarios> {
               ),
               const Spacer(),
               TextButton.icon(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const TelaPerfil(),
+                    ),
+                  );
+                },
                 icon: Image.asset(
                   'assets/Profile_Icon.png',
                   height: 24,

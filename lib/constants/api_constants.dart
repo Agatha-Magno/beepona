@@ -1,2 +1,2 @@
 const baseApiUrl =
-    "https://bug-simply-serious-justify.trycloudflare.com/api/v1";
+    "https://dealtime-swimming-answer-saints.trycloudflare.com/api/v1";
