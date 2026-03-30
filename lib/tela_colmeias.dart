@@ -149,18 +149,11 @@ class _TelaColmeiasState extends State<TelaColmeias> {
                   elevation: 0,
                 ),
                 onPressed: () async {
-                  final listaParaDropdown = [
-                    {
-                      'number': widget.apiario.id,
-                      'nome': widget.apiario.nome,
-                    }
-                  ];
-
                   final colmeia = await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => TelaCadastroColmeia(
-                        apiarios: listaParaDropdown,
+                        apiarioNome: widget.apiario.nome,
                         apiarioId: widget.apiario.id,
                       ),
                     ),
@@ -241,8 +234,20 @@ class _TelaColmeiasState extends State<TelaColmeias> {
                               peso: colmeia.peso,
                               produto: ProdutoEnum.toLabel(colmeia.produto),
                               ativa: colmeia.ativa,
-                              onEdit: () {
-                                // TODO: implementar edição se necessário
+                              onEdit: () async {
+                                final result = await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TelaCadastroColmeia(
+                                      apiarioNome: widget.apiario.nome,
+                                      apiarioId: widget.apiario.id,
+                                      colmeia: colmeia,
+                                    ),
+                                  ),
+                                );
+                                if (result != null) {
+                                  _carregarColmeias();
+                                }
                               },
                               onDelete: () =>
                                   _alterarStatusColmeia(colmeia, false),
