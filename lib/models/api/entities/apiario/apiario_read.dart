@@ -5,7 +5,7 @@ class ApiarioReadApiModel implements IJson {
   final String nome;
   final double? latitude;
   final double? longitude;
-  final int qtdColmeias;
+  final int qtdColmeiasAtivas;
   final bool ativo;
 
   ApiarioReadApiModel({
@@ -13,7 +13,7 @@ class ApiarioReadApiModel implements IJson {
     required this.nome,
     this.latitude,
     this.longitude,
-    required this.qtdColmeias,
+    required this.qtdColmeiasAtivas,
     required this.ativo,
   });
 
@@ -23,7 +23,7 @@ class ApiarioReadApiModel implements IJson {
         nome: json['nome'],
         latitude: (json['latitude'] as num?)?.toDouble(),
         longitude: (json['longitude'] as num?)?.toDouble(),
-        qtdColmeias: json['qtdColmeias'],
+        qtdColmeiasAtivas: json['qtdColmeias'] ?? 0,
         ativo: json['ativo'],
       );
 
@@ -33,7 +33,7 @@ class ApiarioReadApiModel implements IJson {
         'nome': nome,
         'latitude': latitude,
         'longitude': longitude,
-        'qtdColmeias': qtdColmeias,
+        'qtdColmeias': qtdColmeiasAtivas,
         'ativo': ativo,
       };
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_read.dart';
 import 'package:nectracker/repositories/apiario_repository.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_update.dart';
+import 'package:nectracker/repositories/colmeia_repository.dart';
 import 'widgets/apiario.dart';
 import 'tela_cadastro_apiario.dart';
 
@@ -18,7 +19,9 @@ class TelaApiarios extends StatefulWidget {
 
 class _TelaApiariosState extends State<TelaApiarios> {
   final ApiarioRepository _apiarioRepo = ApiarioRepository();
+  final ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
   List<ApiarioReadApiModel> apiarios = [];
+  Map<String, int> _activeHivesCount = {};
   bool isLoading = true;
   bool mostrarAtivos = true;
 
@@ -34,8 +37,20 @@ class _TelaApiariosState extends State<TelaApiarios> {
     });
     try {
       final data = await _apiarioRepo.buscarTodos();
+      
+      final Map<String, int> counts = {};
+      await Future.wait(data.map((apiario) async {
+        try {
+          final hvs = await _colmeiaRepo.buscarTodos(apiarioId: apiario.id);
+          counts[apiario.id] = hvs.where((h) => h.ativa).length;
+        } catch (e) {
+          counts[apiario.id] = 0;
+        }
+      }));
+
       setState(() {
         apiarios = data;
+        _activeHivesCount = counts;
       });
     } catch (e) {
       if (mounted) {
@@ -283,7 +298,7 @@ class _TelaApiariosState extends State<TelaApiarios> {
                               nome: apiario.nome,
                               latitude: apiario.latitude ?? 0.0,
                               longitude: apiario.longitude ?? 0.0,
-                              colmeias: apiario.qtdColmeias,
+                              colmeias: _activeHivesCount[apiario.id] ?? 0,
                               ativo: apiario.ativo,
                               onTap: () async {
                                 if (!apiario.ativo) return;

@@ -72,7 +72,7 @@ class Apiario extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Colmeias: $colmeias',
+                  'Colmeias Ativas: $colmeias',
                   style: TextStyle(
                     fontSize: 16,
                     color: ativo ? Colors.black : Colors.grey[700],
