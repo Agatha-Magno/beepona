@@ -6,9 +6,11 @@ class Apiario extends StatelessWidget {
   final double latitude;
   final double longitude;
   final int colmeias;
+  final bool ativo;
   final VoidCallback onDelete;
   final VoidCallback onEdit;
   final VoidCallback onTap;
+  final VoidCallback onReactivar;
 
   const Apiario({
     super.key,
@@ -20,6 +22,8 @@ class Apiario extends StatelessWidget {
     required this.onDelete,
     required this.onEdit,
     required this.onTap,
+    required this.onReactivar,
+    this.ativo = true,
   });
 
   @override
@@ -32,7 +36,7 @@ class Apiario extends StatelessWidget {
             margin: const EdgeInsets.symmetric(vertical: 8),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFE49A),
+              color: ativo ? const Color(0xFFFFE49A) : Colors.grey[300],
               borderRadius: BorderRadius.circular(12),
               boxShadow: const [
                 BoxShadow(
@@ -50,14 +54,16 @@ class Apiario extends StatelessWidget {
                     Image.asset(
                       'assets/Apiary_Icon.png',
                       height: 28,
+                      color: ativo ? null : Colors.grey[600],
                     ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
                         nome.isNotEmpty ? nome : 'Apiário',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
+                          color: ativo ? Colors.black : Colors.grey[700],
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -66,50 +72,79 @@ class Apiario extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Colmeias: $colmeias', // Show number of hives
-                  style: const TextStyle(fontSize: 16),
+                  'Colmeias: $colmeias',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: ativo ? Colors.black : Colors.grey[700],
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Latitude: ${latitude.toStringAsFixed(5)}',
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: ativo ? Colors.black : Colors.grey[700],
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   'Longitude: ${longitude.toStringAsFixed(5)}',
-                  style: const TextStyle(fontSize: 16),
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: ativo ? Colors.black : Colors.grey[700],
+                  ),
                 ),
               ],
             ),
           ),
         ),
-        Positioned(
-          top: 24,
-          right: 24,
-          child: IconButton(
-            icon: Image.asset(
-              'assets/Edit_Icon.png',
-              height: 24,
+        if (ativo)
+          Positioned(
+            top: 24,
+            right: 24,
+            child: IconButton(
+              icon: Image.asset(
+                'assets/Edit_Icon.png',
+                height: 24,
+              ),
+              onPressed: onEdit,
+              tooltip: 'Editar',
+              padding: EdgeInsets.zero,
+              constraints: const BoxConstraints(),
             ),
-            onPressed: onEdit,
-            tooltip: 'Editar',
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
           ),
-        ),
         Positioned(
           bottom: 24,
           right: 24,
-          child: IconButton(
-            icon: Image.asset(
-              'assets/Delete_Icon.png',
-              height: 28,
-            ),
-            onPressed: onDelete,
-            tooltip: 'Excluir',
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
+          child: ativo
+              ? IconButton(
+                  icon: Image.asset(
+                    'assets/Delete_Icon.png',
+                    height: 28,
+                  ),
+                  onPressed: onDelete,
+                  tooltip: 'Excluir',
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                )
+              : TextButton(
+                  onPressed: onReactivar,
+                  style: TextButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  ),
+                  child: const Text(
+                    'Reativar',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
         ),
       ],
     );

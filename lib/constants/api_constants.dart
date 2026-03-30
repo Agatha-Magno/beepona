@@ -1,2 +1,2 @@
 const baseApiUrl =
-    "https://dealtime-swimming-answer-saints.trycloudflare.com/api/v1";
+    "https://sophisticated-stylus-split-zshops.trycloudflare.com/api/v1";

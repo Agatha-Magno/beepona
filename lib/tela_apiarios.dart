@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nectracker/models/api/entities/apiario/apiario_read.dart';
 import 'package:nectracker/repositories/apiario_repository.dart';
+import 'package:nectracker/models/api/entities/apiario/apiario_update.dart';
 import 'widgets/apiario.dart';
 import 'tela_cadastro_apiario.dart';
 
@@ -19,6 +20,7 @@ class _TelaApiariosState extends State<TelaApiarios> {
   final ApiarioRepository _apiarioRepo = ApiarioRepository();
   List<ApiarioReadApiModel> apiarios = [];
   bool isLoading = true;
+  bool mostrarAtivos = true;
 
   @override
   void initState() {
@@ -218,6 +220,22 @@ class _TelaApiariosState extends State<TelaApiarios> {
                 ),
               ),
             ),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                _buildCategoryButton(
+                  label: 'Ativos',
+                  isSelected: mostrarAtivos,
+                  onTap: () => setState(() => mostrarAtivos = true),
+                ),
+                const SizedBox(width: 16),
+                _buildCategoryButton(
+                  label: 'Inativos',
+                  isSelected: !mostrarAtivos,
+                  onTap: () => setState(() => mostrarAtivos = false),
+                ),
+              ],
+            ),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -242,24 +260,33 @@ class _TelaApiariosState extends State<TelaApiarios> {
                         color: Color(0xFFFF9700),
                       ),
                     )
-                  : apiarios.isEmpty
-                      ? const Center(
+                  : apiarios.where((a) => a.ativo == mostrarAtivos).isEmpty
+                      ? Center(
                           child: Text(
-                            'Nenhum apiário cadastrado.',
-                            style: TextStyle(fontSize: 16),
+                            mostrarAtivos
+                                ? 'Nenhum apiário ativo encontrado.'
+                                : 'Nenhum apiário inativo encontrado.',
+                            style: const TextStyle(fontSize: 16),
                           ),
                         )
                       : ListView.builder(
-                          itemCount: apiarios.length,
+                          itemCount: apiarios
+                              .where((a) => a.ativo == mostrarAtivos)
+                              .length,
                           itemBuilder: (context, index) {
-                            final apiario = apiarios[index];
+                            final filteredApiarios = apiarios
+                                .where((a) => a.ativo == mostrarAtivos)
+                                .toList();
+                            final apiario = filteredApiarios[index];
                             return Apiario(
                               id: apiario.id,
                               nome: apiario.nome,
                               latitude: apiario.latitude ?? 0.0,
                               longitude: apiario.longitude ?? 0.0,
                               colmeias: apiario.qtdColmeias,
+                              ativo: apiario.ativo,
                               onTap: () async {
+                                if (!apiario.ativo) return;
                                 await Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -267,7 +294,7 @@ class _TelaApiariosState extends State<TelaApiarios> {
                                         TelaColmeias(apiario: apiario),
                                   ),
                                 );
-                                _carregarApiarios(); // Recarregar caso algo mude
+                                _carregarApiarios();
                               },
                               onEdit: () async {
                                 final result = await Navigator.push(
@@ -281,9 +308,10 @@ class _TelaApiariosState extends State<TelaApiarios> {
                                   _carregarApiarios();
                                 }
                               },
-                              onDelete: () {
-                                // TODO: implementar soft delete se necessário no backend
-                              },
+                              onDelete: () =>
+                                  _alterarStatusApiario(apiario, false),
+                              onReactivar: () =>
+                                  _alterarStatusApiario(apiario, true),
                             );
                           },
                         ),
@@ -292,5 +320,59 @@ class _TelaApiariosState extends State<TelaApiarios> {
         ),
       ),
     );
+  }
+
+  Widget _buildCategoryButton({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? Colors.black : Colors.grey,
+            ),
+          ),
+          if (isSelected)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              height: 2,
+              width: 40,
+              color: const Color(0xFFFF9700),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _alterarStatusApiario(
+      ApiarioReadApiModel apiario, bool status) async {
+    try {
+      final updateModel = ApiarioUpdateApiModel(
+        id: apiario.id,
+        nome: apiario.nome,
+        latitude: apiario.latitude,
+        longitude: apiario.longitude,
+        ativo: status,
+      );
+      await _apiarioRepo.atualizar(updateModel);
+      _carregarApiarios();
+    } catch (e) {
+      if (mounted) {
+        String mensagemErro = e.toString();
+        if (mensagemErro.startsWith('Exception: ')) {
+          mensagemErro = mensagemErro.substring(11);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao alterar status: $mensagemErro')),
+        );
+      }
+    }
   }
 }

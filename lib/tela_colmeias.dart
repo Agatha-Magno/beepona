@@ -20,6 +20,7 @@ class _TelaColmeiasState extends State<TelaColmeias> {
   final ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
   List<ColmeiaReadUpdateApiModel> colmeias = [];
   bool isLoading = true;
+  bool mostrarAtivas = true;
 
   @override
   void initState() {
@@ -135,7 +136,6 @@ class _TelaColmeiasState extends State<TelaColmeias> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
@@ -149,10 +149,12 @@ class _TelaColmeiasState extends State<TelaColmeias> {
                   elevation: 0,
                 ),
                 onPressed: () async {
-                  final listaParaDropdown = [{
-                    'number': widget.apiario.id,
-                    'nome': widget.apiario.nome,
-                  }];
+                  final listaParaDropdown = [
+                    {
+                      'number': widget.apiario.id,
+                      'nome': widget.apiario.nome,
+                    }
+                  ];
 
                   final colmeia = await Navigator.push(
                     context,
@@ -192,6 +194,22 @@ class _TelaColmeiasState extends State<TelaColmeias> {
               ),
             ),
             const SizedBox(height: 24),
+            Row(
+              children: [
+                _buildCategoryButton(
+                  label: 'Ativas',
+                  isSelected: mostrarAtivas,
+                  onTap: () => setState(() => mostrarAtivas = true),
+                ),
+                const SizedBox(width: 16),
+                _buildCategoryButton(
+                  label: 'Inativas',
+                  isSelected: !mostrarAtivas,
+                  onTap: () => setState(() => mostrarAtivas = false),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             Expanded(
               child: isLoading
                   ? const Center(
@@ -199,28 +217,37 @@ class _TelaColmeiasState extends State<TelaColmeias> {
                         color: Color(0xFFFF9700),
                       ),
                     )
-                  : colmeias.isEmpty
-                      ? const Center(
+                  : colmeias.where((c) => c.ativa == mostrarAtivas).isEmpty
+                      ? Center(
                           child: Text(
-                            'Nenhuma colmeia cadastrada neste apiário.',
-                            style: TextStyle(fontSize: 16),
+                            mostrarAtivas
+                                ? 'Nenhuma colmeia ativa neste apiário.'
+                                : 'Nenhuma colmeia inativa neste apiário.',
+                            style: const TextStyle(fontSize: 16),
                           ),
                         )
                       : ListView.builder(
-                          itemCount: colmeias.length,
+                          itemCount: colmeias
+                              .where((c) => c.ativa == mostrarAtivas)
+                              .length,
                           itemBuilder: (context, index) {
-                            final colmeia = colmeias[index];
+                            final filteredColmeias = colmeias
+                                .where((c) => c.ativa == mostrarAtivas)
+                                .toList();
+                            final colmeia = filteredColmeias[index];
                             return Colmeia(
                               id: colmeia.id,
                               nome: colmeia.nome,
                               peso: colmeia.peso,
                               produto: ProdutoEnum.toLabel(colmeia.produto),
+                              ativa: colmeia.ativa,
                               onEdit: () {
                                 // TODO: implementar edição se necessário
                               },
-                              onDelete: () {
-                                // TODO: implementar exclusão se necessário
-                              },
+                              onDelete: () =>
+                                  _alterarStatusColmeia(colmeia, false),
+                              onReactivar: () =>
+                                  _alterarStatusColmeia(colmeia, true),
                             );
                           },
                         ),
@@ -229,5 +256,58 @@ class _TelaColmeiasState extends State<TelaColmeias> {
         ),
       ),
     );
+  }
+  Widget _buildCategoryButton({
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? Colors.black : Colors.grey,
+            ),
+          ),
+          if (isSelected)
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              height: 2,
+              width: 40,
+              color: const Color(0xFFFF9700),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _alterarStatusColmeia(
+      ColmeiaReadUpdateApiModel colmeia, bool status) async {
+    try {
+      final updateModel = ColmeiaReadUpdateApiModel(
+        id: colmeia.id,
+        nome: colmeia.nome,
+        produto: colmeia.produto,
+        peso: colmeia.peso,
+        ativa: status,
+      );
+      await _colmeiaRepo.atualizar(updateModel);
+      _carregarColmeias();
+    } catch (e) {
+      if (mounted) {
+        String mensagemErro = e.toString();
+        if (mensagemErro.startsWith('Exception: ')) {
+          mensagemErro = mensagemErro.substring(11);
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Erro ao alterar status: $mensagemErro')),
+        );
+      }
+    }
   }
 }
