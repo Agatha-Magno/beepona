@@ -25,7 +25,7 @@ class LoteCreateApiModel implements IJson {
 
   factory LoteCreateApiModel.fromJson(Map<String, dynamic> json) =>
       LoteCreateApiModel(
-        colmeiaId: json['id_colmeia'],
+        colmeiaId: json['colmeiaId'],
         qtdColeta: json['qtd_coleta'],
         armazenamentoColeta: json['armazenamento_coleta'],
         latitude: json['latitude'],
@@ -33,12 +33,12 @@ class LoteCreateApiModel implements IJson {
         coletor: json['coletor'],
         tipoProcessamento: json['tipo_processamento'],
         localProcessamento: json['local_processamento'],
-        dataColeta: json['data_coleta'],
+        dataColeta: json['data_coleta'] != null ? DateTime.parse(json['data_coleta']) : null,
       );
 
   @override
   Map<String, dynamic> toJson() => {
-        'id_colmeia': colmeiaId,
+        'colmeiaId': colmeiaId,
         'qtd_coleta': qtdColeta,
         'armazenamento_coleta': armazenamentoColeta,
         'latitude': latitude,
@@ -46,6 +46,6 @@ class LoteCreateApiModel implements IJson {
         'coletor': coletor,
         'tipo_processamento': tipoProcessamento,
         'local_processamento': localProcessamento,
-        'data_coleta': dataColeta,
+        'data_coleta': dataColeta?.toIso8601String(),
       };
 }

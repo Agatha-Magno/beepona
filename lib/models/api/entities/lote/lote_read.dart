@@ -26,14 +26,14 @@ class LoteReadApiModel implements IJson {
   factory LoteReadApiModel.fromJson(Map<String, dynamic> json) =>
       LoteReadApiModel(
         id: json['id'],
-        qtdColeta: json['qtd_coleta'],
+        qtdColeta: (json['qtd_coleta'] as num).toDouble(),
         armazenamentoColeta: json['armazenamento_coleta'],
-        latitude: json['latitude'],
-        longitude: json['longitude'],
+        latitude: json['latitude'] != null ? (json['latitude'] as num).toDouble() : null,
+        longitude: json['longitude'] != null ? (json['longitude'] as num).toDouble() : null,
         coletor: json['coletor'],
         tipoProcessamento: json['tipo_processamento'],
         localProcessamento: json['local_processamento'],
-        dataColeta: json['data_coleta'],
+        dataColeta: DateTime.parse(json['data_coleta']),
       );
 
   @override
@@ -46,6 +46,6 @@ class LoteReadApiModel implements IJson {
         'coletor': coletor,
         'tipo_processamento': tipoProcessamento,
         'local_processamento': localProcessamento,
-        'data_coleta': dataColeta,
+        'data_coleta': dataColeta.toIso8601String(),
       };
 }

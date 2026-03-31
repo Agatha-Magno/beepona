@@ -1,2 +1,2 @@
 const baseApiUrl =
-    "https://sophisticated-stylus-split-zshops.trycloudflare.com/api/v1";
+    "https://philip-committed-pure-provides.trycloudflare.com/api/v1";

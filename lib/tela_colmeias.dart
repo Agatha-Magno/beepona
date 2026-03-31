@@ -6,6 +6,7 @@ import 'package:nectracker/enums/produto_enum.dart';
 import 'widgets/colmeia.dart';
 import 'tela_cadastro_colmeia.dart';
 import 'tela_perfil.dart';
+import 'tela_lote.dart';
 
 class TelaColmeias extends StatefulWidget {
   final ApiarioReadApiModel apiario;
@@ -202,6 +203,22 @@ class _TelaColmeiasState extends State<TelaColmeias> {
                 ),
               ],
             ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.info_outline, size: 18, color: Colors.grey[700]),
+                const SizedBox(width: 8),
+                Text(
+                  'Clique nas colmeias para ver e cadastrar lotes',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[700],
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
             Expanded(
               child: isLoading
@@ -234,6 +251,17 @@ class _TelaColmeiasState extends State<TelaColmeias> {
                               peso: colmeia.peso,
                               produto: ProdutoEnum.toLabel(colmeia.produto),
                               ativa: colmeia.ativa,
+                              onTap: () async {
+                                if (!colmeia.ativa) return;
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        TelaLote(colmeia: colmeia),
+                                  ),
+                                );
+                                _carregarColmeias();
+                              },
                               onEdit: () async {
                                 final result = await Navigator.push(
                                   context,

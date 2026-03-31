@@ -9,6 +9,7 @@ class Colmeia extends StatelessWidget {
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
   final VoidCallback? onReactivar;
+  final VoidCallback? onTap;
 
   const Colmeia({
     super.key,
@@ -19,6 +20,7 @@ class Colmeia extends StatelessWidget {
     this.onDelete,
     this.onEdit,
     this.onReactivar,
+    this.onTap,
     this.ativa = true,
   });
 
@@ -26,61 +28,64 @@ class Colmeia extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        Container(
-          margin: const EdgeInsets.symmetric(vertical: 8),
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: ativa ? const Color(0xFFFFE49A) : Colors.grey[300],
-            borderRadius: BorderRadius.circular(12),
-            boxShadow: const [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 4,
-                offset: Offset(0, 2),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Image.asset(
-                    'assets/Swarm_Icon.png',
-                    height: 28,
-                    color: ativa ? null : Colors.grey[600],
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      nome.isNotEmpty ? nome : 'Colmeia',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: ativa ? Colors.black : Colors.grey[700],
-                      ),
-                      overflow: TextOverflow.ellipsis,
+        GestureDetector(
+          onTap: onTap,
+          child: Container(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: ativa ? const Color(0xFFFFE49A) : Colors.grey[300],
+              borderRadius: BorderRadius.circular(12),
+              boxShadow: const [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 4,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Image.asset(
+                      'assets/Swarm_Icon.png',
+                      height: 28,
+                      color: ativa ? null : Colors.grey[600],
                     ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        nome.isNotEmpty ? nome : 'Colmeia',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: ativa ? Colors.black : Colors.grey[700],
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Peso: ${peso.toStringAsFixed(2)} kg',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: ativa ? Colors.black : Colors.grey[700],
                   ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Peso: ${peso.toStringAsFixed(2)} kg',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ativa ? Colors.black : Colors.grey[700],
                 ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Produto: $produto',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: ativa ? Colors.black : Colors.grey[700],
+                const SizedBox(height: 8),
+                Text(
+                  'Produto: $produto',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: ativa ? Colors.black : Colors.grey[700],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         if (ativa && onEdit != null)
