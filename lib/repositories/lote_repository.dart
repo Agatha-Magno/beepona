@@ -13,7 +13,10 @@ class LoteRepository extends BaseRepository {
     );
 
     if (!response.success) {
-      throw Exception(response.message ?? 'Falha ao criar lote');
+      final errorMessage = response.message ??
+          response.errors?.toString() ??
+          'Falha ao criar lote';
+      throw Exception(errorMessage);
     }
   }
 

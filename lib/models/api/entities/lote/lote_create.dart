@@ -1,8 +1,8 @@
 import 'package:nectracker/interfaces/json/i_json.dart';
 
 class LoteCreateApiModel implements IJson {
-  final String colmeiaId;
-  final double qtdColeta;
+  final String id_colmeia;
+  final double qtd_coleta;
   final String? armazenamentoColeta;
   final double? latitude;
   final double? longitude;
@@ -12,8 +12,8 @@ class LoteCreateApiModel implements IJson {
   final DateTime? dataColeta;
 
   LoteCreateApiModel({
-    required this.colmeiaId,
-    required this.qtdColeta,
+    required this.id_colmeia,
+    required this.qtd_coleta,
     this.armazenamentoColeta,
     this.latitude,
     this.longitude,
@@ -25,21 +25,23 @@ class LoteCreateApiModel implements IJson {
 
   factory LoteCreateApiModel.fromJson(Map<String, dynamic> json) =>
       LoteCreateApiModel(
-        colmeiaId: json['colmeiaId'],
-        qtdColeta: json['qtd_coleta'],
+        id_colmeia: json['id_colmeia'],
+        qtd_coleta: json['qtd_coleta'],
         armazenamentoColeta: json['armazenamento_coleta'],
         latitude: json['latitude'],
         longitude: json['longitude'],
         coletor: json['coletor'],
         tipoProcessamento: json['tipo_processamento'],
         localProcessamento: json['local_processamento'],
-        dataColeta: json['data_coleta'] != null ? DateTime.parse(json['data_coleta']) : null,
+        dataColeta: json['data_coleta'] != null
+            ? DateTime.parse(json['data_coleta'])
+            : null,
       );
 
   @override
   Map<String, dynamic> toJson() => {
-        'colmeiaId': colmeiaId,
-        'qtd_coleta': qtdColeta,
+        'id_colmeia': id_colmeia,
+        'qtd_coleta': qtd_coleta,
         'armazenamento_coleta': armazenamentoColeta,
         'latitude': latitude,
         'longitude': longitude,

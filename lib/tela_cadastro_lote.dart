@@ -79,6 +79,21 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
     }
 
     final qtd = double.tryParse(qtdText.replaceAll(',', '.')) ?? 0.0;
+    if (qtd <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Por favor, informe uma quantidade válida.')),
+      );
+      return;
+    }
+
+    if (_selectedArmazenamento == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+            content: Text('Por favor, selecione o tipo de armazenamento.')),
+      );
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -86,13 +101,19 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
 
     try {
       final modelo = LoteCreateApiModel(
-        colmeiaId: widget.colmeiaId,
-        qtdColeta: qtd,
+        id_colmeia: widget.colmeiaId,
+        qtd_coleta: qtd,
         armazenamentoColeta: _selectedArmazenamento,
-        coletor: coletorController.text.trim(),
+        coletor: coletorController.text.trim().isNotEmpty
+            ? coletorController.text.trim()
+            : null,
         dataColeta: _selectedDate.toUtc(),
-        localProcessamento: localController.text.trim(),
-        tipoProcessamento: tipoProcController.text.trim(),
+        localProcessamento: localController.text.trim().isNotEmpty
+            ? localController.text.trim()
+            : null,
+        tipoProcessamento: tipoProcController.text.trim().isNotEmpty
+            ? tipoProcController.text.trim()
+            : null,
       );
 
       await _loteRepo.criar(modelo);
@@ -170,7 +191,6 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                
                 _buildLabel('Quantidade de Coleta'),
                 Row(
                   children: [
@@ -184,7 +204,8 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                           fillColor: Color(0xFFFFE49A),
                           hintText: 'Quantidade',
                         ),
-                        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
                       ),
                     ),
                     const SizedBox(width: 8),
@@ -215,7 +236,6 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                     ),
                   ],
                 ),
-                
                 const SizedBox(height: 16),
                 _buildLabel('Tipo de Armazenamento'),
                 Container(
@@ -243,7 +263,6 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                     ),
                   ),
                 ),
-                
                 const SizedBox(height: 16),
                 _buildLabel('Coletor'),
                 TextField(
@@ -255,7 +274,6 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                     hintText: 'Nome do coletor',
                   ),
                 ),
-                
                 const SizedBox(height: 16),
                 _buildLabel('Data da Coleta'),
                 GestureDetector(
@@ -272,7 +290,6 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                     ),
                   ),
                 ),
-                
                 const SizedBox(height: 16),
                 _buildLabel('Local do Processamento'),
                 TextField(
@@ -284,7 +301,6 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                     hintText: 'Local onde foi processado',
                   ),
                 ),
-                
                 const SizedBox(height: 16),
                 _buildLabel('Tipo de Processamento'),
                 TextField(
@@ -296,7 +312,6 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                     hintText: 'Ex: Centrífuga, Manual...',
                   ),
                 ),
-                
                 const SizedBox(height: 100),
               ],
             ),
@@ -324,7 +339,8 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
                       ? const CircularProgressIndicator(color: Colors.white)
                       : const Text(
                           'Salvar Lote',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
                         ),
                 ),
               ),

@@ -1,2 +1,2 @@
 const baseApiUrl =
-    "https://philip-committed-pure-provides.trycloudflare.com/api/v1";
+    "https://regulatory-rapids-amongst-hospital.trycloudflare.com/api/v1";
