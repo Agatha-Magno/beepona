@@ -1,77 +1,58 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:nectracker/controllers/auth_controller.dart';
+import 'package:nectracker/models/api/entities/usuario/usuario_confirmar_email.dart';
+import 'package:nectracker/tela_login.dart';
 
 class TelaConfirmarEmail extends StatefulWidget {
-  const TelaConfirmarEmail({super.key});
+  final String? token;
+  final String? userId;
+
+  const TelaConfirmarEmail({super.key, this.token, this.userId});
 
   @override
   State<TelaConfirmarEmail> createState() => _TelaConfirmarEmailState();
 }
 
 class _TelaConfirmarEmailState extends State<TelaConfirmarEmail> {
-  Timer? _timer;
-  int _secondsRemaining = 60;
-  bool _isResendEnabled = false;
+  bool _isLoading = true;
+  String _message = 'Confirmando e-mail...';
+  bool _isSuccess = false;
 
   @override
   void initState() {
     super.initState();
-    _startTimer();
+    _confirmEmail();
   }
 
-  void _startTimer() {
-    setState(() {
-      _secondsRemaining = 60;
-      _isResendEnabled = false;
-    });
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_secondsRemaining > 0) {
-        setState(() {
-          _secondsRemaining--;
-        });
-      } else {
-        setState(() {
-          _isResendEnabled = true;
-          _timer?.cancel();
-        });
-      }
-    });
-  }
-
-  Future<void> _resendEmail() async {
-    if (_isResendEnabled) {
-      try {
-        await AuthController.reenviarConfirmacao();
-
-        if (!mounted) return;
-
-        _startTimer();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('E-mail de confirmação reenviado!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      } catch (error) {
-        if (!mounted) return;
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(error.toString().replaceAll('Exception: ', '')),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+  Future<void> _confirmEmail() async {
+    if (widget.token == null || widget.userId == null) {
+      setState(() {
+        _isLoading = false;
+        _message = 'Link de confirmação inválido.';
+        _isSuccess = false;
+      });
+      return;
     }
-  }
 
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
+    try {
+      final model = UsuarioConfirmarEmailModel(
+        userId: widget.userId!,
+        token: widget.token!,
+      );
+      await AuthController.confirmarEmail(model);
+      
+      setState(() {
+        _isLoading = false;
+        _message = 'E-mail confirmado com sucesso!';
+        _isSuccess = true;
+      });
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _message = e.toString().replaceAll('Exception: ', '');
+        _isSuccess = false;
+      });
+    }
   }
 
   @override
@@ -83,6 +64,7 @@ class _TelaConfirmarEmailState extends State<TelaConfirmarEmail> {
         elevation: 0,
         automaticallyImplyLeading: true,
         iconTheme: const IconThemeData(color: Colors.black87),
+        title: const Text('Confirmação de E-mail', style: TextStyle(color: Colors.black87)),
       ),
       body: Center(
         child: Padding(
@@ -90,55 +72,52 @@ class _TelaConfirmarEmailState extends State<TelaConfirmarEmail> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(
-                Icons.mark_email_unread_outlined,
-                size: 100,
-                color: Colors.black87,
-              ),
+              if (_isLoading)
+                const CircularProgressIndicator(color: Colors.black87)
+              else
+                Icon(
+                  _isSuccess ? Icons.check_circle_outline : Icons.error_outline,
+                  size: 100,
+                  color: _isSuccess ? Colors.green : Colors.red,
+                ),
               const SizedBox(height: 32),
-              const Text(
-                'Verifique seu e-mail',
-                style: TextStyle(
-                  fontSize: 24,
+              Text(
+                _message,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
-              const SizedBox(height: 16),
-              const Text(
-                'Enviamos um link de confirmação para o seu endereço de e-mail. Por favor, verifique sua caixa de entrada e clique no link para ativar sua conta.',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87,
-                ),
-              ),
               const SizedBox(height: 48),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _isResendEnabled ? _resendEmail : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black87,
-                    foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.black38,
-                    disabledForegroundColor: Colors.white70,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+              if (!_isLoading)
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => const TelaLogin()),
+                        (Route<dynamic> route) => false,
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black87,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                  ),
-                  child: Text(
-                    _isResendEnabled
-                        ? 'Reenviar E-mail'
-                        : 'Reenviar em ${_secondsRemaining}s',
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                    child: const Text(
+                      'Ir para o Login',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
             ],
           ),
         ),

@@ -1,2 +1,2 @@
-const baseApiUrl =
-    "https://regulatory-rapids-amongst-hospital.trycloudflare.com/api/v1";
+const baseUrl = "https://beepona.projs.net";
+const baseApiUrl = "$baseUrl/api/v1";

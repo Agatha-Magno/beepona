@@ -101,8 +101,8 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
 
     try {
       final modelo = LoteCreateApiModel(
-        id_colmeia: widget.colmeiaId,
-        qtd_coleta: qtd,
+        idColmeia: widget.colmeiaId,
+        qtdColeta: qtd,
         armazenamentoColeta: _selectedArmazenamento,
         coletor: coletorController.text.trim().isNotEmpty
             ? coletorController.text.trim()
@@ -321,7 +321,7 @@ class _TelaCadastroLoteState extends State<TelaCadastroLote> {
             right: 0,
             bottom: 0,
             child: Container(
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.white.withValues(alpha: 0.9),
               padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
               child: SizedBox(
                 width: double.infinity,

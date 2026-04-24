@@ -4,7 +4,7 @@ import 'package:nectracker/interfaces/api/i_api_endpoints_enum.dart';
 enum UsuarioEndpointsEnum implements IApiEndpointsEnum {
   registrar("/registrar-usuario", ApiMetodoEnum.post),
   login("/login-usuario", ApiMetodoEnum.post),
-  verificarEmail("/verificar-email", ApiMetodoEnum.get),
+  confirmarEmail("/confirmar-email", ApiMetodoEnum.post),
   reenviarAtivarEmail("/reenviar-ativacao-email", ApiMetodoEnum.post),
   solicitarResetSenha("/solicitar-reset-senha", ApiMetodoEnum.post),
   resetarSenha("/reset-senha", ApiMetodoEnum.post);

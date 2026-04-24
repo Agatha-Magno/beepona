@@ -1,4 +1,6 @@
-class UsuarioInfoApiModel {
+import 'package:nectracker/interfaces/json/i_json.dart';
+
+class UsuarioInfoApiModel implements IJson {
   final String nome;
   final String email;
 
@@ -7,12 +9,14 @@ class UsuarioInfoApiModel {
     required this.email,
   });
 
+  @override
   factory UsuarioInfoApiModel.fromJson(Map<String, dynamic> json) =>
       UsuarioInfoApiModel(
         nome: json['nome'],
         email: json['email'],
       );
 
+  @override
   Map<String, dynamic> toJson() => {
         'nome': nome,
         'email': email,

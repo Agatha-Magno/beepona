@@ -1,8 +1,8 @@
 import 'package:nectracker/interfaces/json/i_json.dart';
 
 class LoteCreateApiModel implements IJson {
-  final String id_colmeia;
-  final double qtd_coleta;
+  final String idColmeia;
+  final double qtdColeta;
   final String? armazenamentoColeta;
   final double? latitude;
   final double? longitude;
@@ -12,8 +12,8 @@ class LoteCreateApiModel implements IJson {
   final DateTime? dataColeta;
 
   LoteCreateApiModel({
-    required this.id_colmeia,
-    required this.qtd_coleta,
+    required this.idColmeia,
+    required this.qtdColeta,
     this.armazenamentoColeta,
     this.latitude,
     this.longitude,
@@ -25,8 +25,8 @@ class LoteCreateApiModel implements IJson {
 
   factory LoteCreateApiModel.fromJson(Map<String, dynamic> json) =>
       LoteCreateApiModel(
-        id_colmeia: json['id_colmeia'],
-        qtd_coleta: json['qtd_coleta'],
+        idColmeia: json['id_colmeia'],
+        qtdColeta: json['qtd_coleta'],
         armazenamentoColeta: json['armazenamento_coleta'],
         latitude: json['latitude'],
         longitude: json['longitude'],
@@ -40,8 +40,8 @@ class LoteCreateApiModel implements IJson {
 
   @override
   Map<String, dynamic> toJson() => {
-        'id_colmeia': id_colmeia,
-        'qtd_coleta': qtd_coleta,
+        'id_colmeia': idColmeia,
+        'qtd_coleta': qtdColeta,
         'armazenamento_coleta': armazenamentoColeta,
         'latitude': latitude,
         'longitude': longitude,

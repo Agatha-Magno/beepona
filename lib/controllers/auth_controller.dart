@@ -1,7 +1,9 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_auth.dart';
+import 'package:nectracker/models/api/entities/usuario/usuario_confirmar_email.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_create.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_info.dart';
+import 'package:nectracker/models/api/entities/usuario/usuario_reset_senha.dart';
 import 'package:nectracker/repositories/auth_repository.dart';
 import 'package:signals/signals.dart';
 
@@ -28,6 +30,14 @@ class AuthController {
     await _storage.write(key: _storageTokenKey, value: token.value!);
   }
 
+  static Future<void> logout() async {
+    token.value = null;
+    usuarioInfo.value = null;
+    emailConfirmacao.value = null;
+
+    await _storage.delete(key: _storageTokenKey);
+  }
+
   static Future<void> registrar(UsuarioCreateApiModel usuario) async {
     await _authRepository.registrar(usuario);
 
@@ -40,5 +50,18 @@ class AuthController {
     }
 
     await _authRepository.reenviarConfirmacao(emailConfirmacao.value!);
+  }
+
+  static Future<void> confirmarEmail(UsuarioConfirmarEmailModel usuario) async {
+    await _authRepository.confirmarEmail(usuario);
+  }
+
+  static Future<void> solicitarResetSenha(String email) async {
+    await _authRepository.solicitarResetSenha(email);
+  }
+
+  static Future<void> resetarSenha(
+      UsuarioResetSenhaApiModel usuarioResetSenha) async {
+    await _authRepository.resetarSenha(usuarioResetSenha);
   }
 }

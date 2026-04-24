@@ -27,7 +27,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
   final TextEditingController pesoController = TextEditingController();
   String produtoSelecionado = 'Mel';
   String? apiarioSelecionado;
-  ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
+  final ColmeiaRepository _colmeiaRepo = ColmeiaRepository();
   bool _isLoading = false;
 
   @override
@@ -213,7 +213,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                 const SizedBox(height: 16),
                 _buildLabel('Produto'),
                 DropdownButtonFormField<String>(
-                  value: produtoSelecionado,
+                  initialValue: produtoSelecionado,
                   items: ['Mel', 'Própolis', 'Outros']
                       .map((prod) => DropdownMenuItem(
                             value: prod,
@@ -245,7 +245,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                 ),
                 const SizedBox(height: 16),
                 _buildLabel('Apiário'),
-                Container(
+                SizedBox(
                   width: double.infinity,
                   child: Text(
                     widget.colmeia != null

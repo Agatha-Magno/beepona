@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nectracker/controllers/auth_controller.dart';
+import 'package:nectracker/tela_inicial.dart';
 
 class TelaPerfil extends StatelessWidget {
   const TelaPerfil({super.key});
@@ -75,9 +76,67 @@ class TelaPerfil extends StatelessWidget {
                   elevation: 0,
                 ),
                 onPressed: () {
-                  // TODO: Implementar troca de senha
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Funcionalidade de trocar senha em breve.')),
+                  showDialog(
+                    context: context,
+                    builder: (dialogContext) => AlertDialog(
+                      title: const Text('Trocar Senha'),
+                      content: const Text(
+                          'Deseja receber um e-mail com instruções para redefinir sua senha?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                          child: const Text('Cancelar',
+                              style: TextStyle(color: Colors.black54)),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.of(dialogContext).pop();
+
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (loadingContext) => const Center(
+                                child: CircularProgressIndicator(
+                                    color: Color(0xFFFEC107)),
+                              ),
+                            );
+
+                            try {
+                              await AuthController.solicitarResetSenha(
+                                  info?.email ?? '');
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text(
+                                      'Um e-mail de redefinição de senha foi enviado para sua conta!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                              await AuthController.logout();
+                              if (!context.mounted) return;
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                    builder: (context) => const TelaInicial()),
+                                (route) => false,
+                              );
+                            } catch (e) {
+                              if (!context.mounted) return;
+                              Navigator.of(context).pop();
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e
+                                      .toString()
+                                      .replaceAll('Exception: ', '')),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text('Sim, enviar e-mail',
+                              style: TextStyle(color: Color(0xFF4CB050))),
+                        ),
+                      ],
+                    ),
                   );
                 },
                 child: Row(
@@ -96,13 +155,84 @@ class TelaPerfil extends StatelessWidget {
                 ),
               ),
             ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  elevation: 0,
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (dialogContext) => AlertDialog(
+                      title: const Text('Sair da Conta'),
+                      content: const Text(
+                          'Tem certeza que deseja sair do aplicativo?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(dialogContext).pop(),
+                          child: const Text('Cancelar',
+                              style: TextStyle(color: Colors.black54)),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.of(dialogContext).pop();
+
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (loadingContext) => const Center(
+                                child: CircularProgressIndicator(
+                                    color: Color(0xFFFEC107)),
+                              ),
+                            );
+
+                            await AuthController.logout();
+                            if (!context.mounted) return;
+                            Navigator.of(context).pushAndRemoveUntil(
+                              MaterialPageRoute(
+                                  builder: (context) => const TelaInicial()),
+                              (route) => false,
+                            );
+                          },
+                          child: const Text('Sim, sair',
+                              style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Icon(Icons.logout, size: 24),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Sair (Logout)',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildProfileItem({required String label, required String value, required dynamic icon}) {
+  Widget _buildProfileItem(
+      {required String label, required String value, required dynamic icon}) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

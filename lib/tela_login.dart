@@ -28,9 +28,10 @@ class _TelaLoginState extends State<TelaLogin> {
       await AuthController.login(usuario);
 
       if (!mounted) return;
-      Navigator.pushReplacement(
+      Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const TelaApiarios()),
+        (route) => false,
       );
     } catch (e) {
       if (!mounted) return;

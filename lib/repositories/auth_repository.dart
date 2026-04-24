@@ -1,7 +1,9 @@
 import 'package:nectracker/enums/api/endpoints/usuario_endpoints_enum.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_auth.dart';
+import 'package:nectracker/models/api/entities/usuario/usuario_confirmar_email.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_create.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_info.dart';
+import 'package:nectracker/models/api/entities/usuario/usuario_reset_senha.dart';
 import 'package:nectracker/repositories/base_repository.dart';
 
 class AuthRepository extends BaseRepository {
@@ -59,6 +61,48 @@ class AuthRepository extends BaseRepository {
       return;
     } else {
       throw Exception(response.message ?? 'Falha ao reenviar confirmação.');
+    }
+  }
+
+  Future<void> resetarSenha(UsuarioResetSenhaApiModel usuarioReset) async {
+    final response = await api.request(
+      endpoint: UsuarioEndpointsEnum.resetarSenha,
+      data: usuarioReset.toJson(),
+      requiresAuth: false,
+    );
+
+    if (response.success) {
+      return;
+    } else {
+      throw Exception(response.message ?? 'Falha ao redefinir senha.');
+    }
+  }
+
+  Future<void> solicitarResetSenha(String email) async {
+    final response = await api.request(
+      endpoint: UsuarioEndpointsEnum.solicitarResetSenha,
+      data: {'email': email},
+      requiresAuth: false,
+    );
+
+    if (response.success) {
+      return;
+    } else {
+      throw Exception(response.message ?? 'Falha ao solicitar reset de senha.');
+    }
+  }
+
+  Future<void> confirmarEmail(UsuarioConfirmarEmailModel usuario) async {
+    final response = await api.request(
+      endpoint: UsuarioEndpointsEnum.confirmarEmail,
+      data: usuario.toJson(),
+      requiresAuth: false,
+    );
+
+    if (response.success) {
+      return;
+    } else {
+      throw Exception(response.message ?? 'Falha ao confirmar email.');
     }
   }
 }

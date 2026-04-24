@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:nectracker/controllers/auth_controller.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_create.dart';
-import 'package:nectracker/tela_confirmar_email.dart';
+import 'package:nectracker/tela_solicita_email.dart';
 
 class TelaCadastro extends StatefulWidget {
   const TelaCadastro({super.key});
@@ -36,7 +36,7 @@ class _TelaCadastroState extends State<TelaCadastro> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const TelaConfirmarEmail()),
+        MaterialPageRoute(builder: (context) => const TelaSolicitaEmail()),
       );
     } catch (e) {
       if (!mounted) return;
