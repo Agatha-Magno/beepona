@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'package:nectracker/enums/api/endpoints/lote_endpoints_enum.dart';
 import 'package:nectracker/models/api/entities/lote/lote_create.dart';
 import 'package:nectracker/models/api/entities/lote/lote_read.dart';
@@ -45,5 +46,12 @@ class LoteRepository extends BaseRepository {
     } else {
       throw Exception(response.message ?? 'Falha ao listar lotes');
     }
+  }
+
+  Future<Uint8List> gerarQrCode(String id) async {
+    return await api.requestBytes(
+      endpoint: LoteEndpointsEnum.gerarQrCode,
+      queryParameters: {'id': id},
+    );
   }
 }

@@ -4,7 +4,8 @@ import 'package:nectracker/interfaces/api/i_api_endpoints_enum.dart';
 enum LoteEndpointsEnum implements IApiEndpointsEnum {
   criar("/criar-lote", ApiMetodoEnum.post),
   buscarPorId("/get-lote", ApiMetodoEnum.get),
-  buscarTodos("/get-all-lotes", ApiMetodoEnum.get);
+  buscarTodos("/get-all-lotes", ApiMetodoEnum.get),
+  gerarQrCode("/gerar-qr-lote", ApiMetodoEnum.get);
 
   static const String _prefixo = "/Lote";
 

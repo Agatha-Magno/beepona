@@ -232,7 +232,7 @@ class _TelaCadastroColmeiaState extends State<TelaCadastroColmeia> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                _buildLabel('Peso'),
+                _buildLabel('Peso (kg)'),
                 TextField(
                   controller: pesoController,
                   decoration: const InputDecoration(

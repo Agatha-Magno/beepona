@@ -9,6 +9,7 @@ class Lote extends StatelessWidget {
   final DateTime dataColeta;
   final String? localProcessamento;
   final String? tipoProcessamento;
+  final VoidCallback? onTap;
 
   const Lote({
     super.key,
@@ -19,11 +20,14 @@ class Lote extends StatelessWidget {
     required this.dataColeta,
     this.localProcessamento,
     this.tipoProcessamento,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
       margin: const EdgeInsets.symmetric(vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -62,8 +66,7 @@ class Lote extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _buildInfoRow('Quantidade:',
-              '${qtdColeta.toStringAsFixed(2)} unidades'), // Unit handle later
+          _buildInfoRow('Quantidade:', '${qtdColeta.toStringAsFixed(2)} kg'),
           _buildInfoRow(
               'Armazenamento:', armazenamentoColeta ?? 'Não informado'),
           _buildInfoRow('Coletor:', coletor ?? 'Não informado'),
@@ -72,7 +75,7 @@ class Lote extends StatelessWidget {
           _buildInfoRow('Tipo Proc.:', tipoProcessamento ?? 'Não informado'),
         ],
       ),
-    );
+    ));
   }
 
   Widget _buildInfoRow(String label, String value) {

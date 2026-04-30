@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:nectracker/constants/api_constants.dart';
 import 'package:nectracker/controllers/auth_controller.dart';
@@ -53,6 +54,36 @@ class BeeponaApi {
         }
       }
       rethrow;
+    }
+  }
+
+  Future<Uint8List> requestBytes({
+    required IApiEndpointsEnum endpoint,
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    bool requiresAuth = true,
+  }) async {
+    final options = Options(
+      method: endpoint.metodo.name.toUpperCase(),
+      responseType: ResponseType.bytes,
+      extra: {'requiresAuth': requiresAuth},
+    );
+
+    try {
+      final response = await _dio.request(
+        endpoint.path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+
+      if (response.statusCode == 200) {
+        return Uint8List.fromList(response.data as List<int>);
+      } else {
+        throw Exception('Erro ao baixar arquivo: código ${response.statusCode}');
+      }
+    } on DioException catch (e) {
+      throw Exception('Falha ao baixar arquivo: ${e.message}');
     }
   }
 }

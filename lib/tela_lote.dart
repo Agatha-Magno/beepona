@@ -4,6 +4,7 @@ import 'package:nectracker/models/api/entities/lote/lote_read.dart';
 import 'package:nectracker/repositories/lote_repository.dart';
 import 'widgets/lote.dart';
 import 'tela_cadastro_lote.dart';
+import 'tela_detalhes_lote.dart';
 import 'tela_perfil.dart';
 
 class TelaLote extends StatefulWidget {
@@ -209,6 +210,14 @@ class _TelaLoteState extends State<TelaLote> {
                               dataColeta: lote.dataColeta,
                               localProcessamento: lote.localProcessamento,
                               tipoProcessamento: lote.tipoProcessamento,
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => TelaDetalhesLote(lote: lote),
+                                  ),
+                                );
+                              },
                             );
                           },
                         ),
