@@ -35,6 +35,16 @@ class TelaInicial extends StatelessWidget {
                       'assets/logo_ifto.png',
                       height: 60,
                     ),
+                    const SizedBox(height: 16),
+                    Image.asset(
+                      'assets/logo_cdr.png',
+                      height: 60,
+                    ),
+                    const SizedBox(height: 16),
+                    Image.asset(
+                      'assets/logo_fapt.png',
+                      height: 40,
+                    ),
                   ],
                 ),
               ),

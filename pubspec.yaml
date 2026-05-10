@@ -88,6 +88,8 @@ flutter:
     - assets/beepona_icon.png
     - assets/logo.png
     - assets/logo_ifto.png
+    - assets/logo_cdr.png
+    - assets/logo_fapt.png
     - assets/Search_Icon.png
     - assets/Apiary_Icon.png
     - assets/Plus_Icon.png
