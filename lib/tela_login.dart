@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:nectracker/controllers/auth_controller.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_auth.dart';
 import 'tela_apiarios.dart';
+import 'tela_solicitar_reset_senha.dart';
 
 class TelaLogin extends StatefulWidget {
   const TelaLogin({super.key});
@@ -97,7 +98,33 @@ class _TelaLoginState extends State<TelaLogin> {
                       obscureText: true,
                       onChanged: (value) => senha = value,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 8),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const TelaSolicitarResetSenha(),
+                            ),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        ),
+                        child: const Text(
+                          'Esqueci minha senha',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontWeight: FontWeight.bold,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
