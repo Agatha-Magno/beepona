@@ -1,3 +1,4 @@
+import 'package:nectracker/controllers/auth_controller.dart';
 import 'package:nectracker/enums/api/endpoints/usuario_endpoints_enum.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_auth.dart';
 import 'package:nectracker/models/api/entities/usuario/usuario_confirmar_email.dart';
@@ -19,7 +20,31 @@ class AuthRepository extends BaseRepository {
     if (response.success && response.data != null) {
       return {
         'token': response.data['token'],
+        'refreshToken': response.data['refreshToken'],
         'usuario': UsuarioInfoApiModel.fromJson(response.data['usuario']),
+      };
+    } else {
+      throw Exception(response.message ?? 'Falha ao fazer login');
+    }
+  }
+
+  Future<Map<String, dynamic>> refreshToken() async {
+    final refreshToken = tokens.value?.refreshToken;
+
+    if (refreshToken == null) {
+      throw Exception('Falha ao fazer login');
+    }
+
+    final response = await api.request(
+      endpoint: UsuarioEndpointsEnum.refreshToken,
+      data: {'refreshToken': refreshToken},
+      requiresAuth: false,
+    );
+
+    if (response.success && response.data != null) {
+      return {
+        'token': response.data['token'],
+        'refreshToken': response.data['refreshToken'],
       };
     } else {
       throw Exception(response.message ?? 'Falha ao fazer login');
@@ -103,6 +128,21 @@ class AuthRepository extends BaseRepository {
       return;
     } else {
       throw Exception(response.message ?? 'Falha ao confirmar email.');
+    }
+  }
+
+  Future<void> buscarInfoUsuario() async {
+    final response = await api.request(
+      endpoint: UsuarioEndpointsEnum.buscarInfoUsuario,
+      requiresAuth: true,
+    );
+
+    if (response.success && response.data != null) {
+      usuarioInfo.value =
+          UsuarioInfoApiModel.fromJson(response.data['usuario']);
+    } else {
+      throw Exception(
+          response.message ?? 'Falha ao buscar informações do usuário.');
     }
   }
 }

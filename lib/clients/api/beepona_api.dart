@@ -15,10 +15,35 @@ class BeeponaApi {
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) {
         final requiresAuth = options.extra['requiresAuth'] ?? true;
-        if (requiresAuth && token.value != null) {
-          options.headers['Authorization'] = 'Bearer ${token.value}';
+        if (requiresAuth && tokens.value != null && tokens.value!.token != null) {
+          options.headers['Authorization'] = 'Bearer ${tokens.value!.token}';
         }
         return handler.next(options);
+      },
+      onError: (DioException e, handler) async {
+        final requiresAuth = e.requestOptions.extra['requiresAuth'] ?? true;
+        final isRetry = e.requestOptions.extra['isRetry'] ?? false;
+
+        if ((e.response?.statusCode == 401 || e.response?.statusCode == 403) &&
+            requiresAuth &&
+            !isRetry) {
+          try {
+            await AuthController.refreshToken();
+
+            if (tokens.value != null && tokens.value!.token != null) {
+              e.requestOptions.headers['Authorization'] =
+                  'Bearer ${tokens.value!.token}';
+            }
+
+            e.requestOptions.extra['isRetry'] = true;
+            final cloneReq = await _dio.fetch(e.requestOptions);
+            return handler.resolve(cloneReq);
+          } catch (refreshError) {
+            await AuthController.logout();
+            return handler.next(e);
+          }
+        }
+        return handler.next(e);
       },
     ));
   }
@@ -43,14 +68,17 @@ class BeeponaApi {
       );
 
       // Tratando casos onde o retorno possa vir como string
-      final responseData = response.data is String ? jsonDecode(response.data) : response.data;
+      final responseData =
+          response.data is String ? jsonDecode(response.data) : response.data;
 
       return ApiResponse.fromJson(responseData as Map<String, dynamic>);
     } on DioException catch (e) {
       if (e.response != null && e.response?.data != null) {
-        final errorData = e.response!.data is String ? jsonDecode(e.response!.data) : e.response!.data;
+        final errorData = e.response!.data is String
+            ? jsonDecode(e.response!.data)
+            : e.response!.data;
         if (errorData is Map<String, dynamic>) {
-           return ApiResponse.fromJson(errorData);
+          return ApiResponse.fromJson(errorData);
         }
       }
       rethrow;
@@ -80,7 +108,8 @@ class BeeponaApi {
       if (response.statusCode == 200) {
         return Uint8List.fromList(response.data as List<int>);
       } else {
-        throw Exception('Erro ao baixar arquivo: código ${response.statusCode}');
+        throw Exception(
+            'Erro ao baixar arquivo: código ${response.statusCode}');
       }
     } on DioException catch (e) {
       throw Exception('Falha ao baixar arquivo: ${e.message}');

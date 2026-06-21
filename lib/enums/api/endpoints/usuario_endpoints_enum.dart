@@ -7,7 +7,9 @@ enum UsuarioEndpointsEnum implements IApiEndpointsEnum {
   confirmarEmail("/confirmar-email", ApiMetodoEnum.post),
   reenviarAtivarEmail("/reenviar-ativacao-email", ApiMetodoEnum.post),
   solicitarResetSenha("/solicitar-reset-senha", ApiMetodoEnum.post),
-  resetarSenha("/reset-senha", ApiMetodoEnum.post);
+  resetarSenha("/reset-senha", ApiMetodoEnum.post),
+  refreshToken("/refresh-token", ApiMetodoEnum.post),
+  buscarInfoUsuario("/get-usuario-info", ApiMetodoEnum.get);
 
   static const String _prefixo = "/Usuario";
 

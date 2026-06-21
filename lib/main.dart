@@ -7,6 +7,7 @@ import 'package:app_links/app_links.dart';
 import 'package:nectracker/tela_confirmar_email.dart';
 import 'package:nectracker/tela_reset_senha.dart';
 import 'package:nectracker/tela_apiarios.dart';
+import 'package:signals/signals_flutter.dart';
 
 void main() async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
@@ -107,7 +108,9 @@ class _MyAppState extends State<MyApp> {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: token.value != null ? const TelaApiarios() : const TelaInicial(),
+      home: Watch((context) => tokens.value?.token != null
+          ? const TelaApiarios()
+          : const TelaInicial()),
     );
   }
 }
